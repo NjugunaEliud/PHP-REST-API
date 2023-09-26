@@ -95,4 +95,51 @@ if($sql){
 }
 }
 
+function getCustomer($customerParams) {
+    global $conn;
+    
+    if ($customerParams == null) {
+        return error422("Enter your customer id");
+    }
+    
+    $customerId = mysqli_real_escape_string($conn, $customerParams['id']);
+    $query = "SELECT * FROM customer WHERE id = '$customerId' LIMIT 1";
+    $result = mysqli_query($conn, $query);
+
+    if ($result) {
+        if (mysqli_num_rows($result) == 1) {
+            $res = mysqli_fetch_assoc($result);
+            $data = [
+                'status' => 200,
+                'message' => $RequestMethod . " Customer fetched",
+                'data' => $res
+            ];
+
+            header("HTTP/1.1 200 Ok");
+            header('Content-Type: application/json');
+            return json_encode($data);
+        } else {
+            $data = [
+                'status' => 404,
+                'message' => $RequestMethod . " No customer found"
+            ];
+
+            header("HTTP/1.1 404 Not Found");
+            header('Content-Type: application/json');
+            return json_encode($data);
+        }
+    } else {
+        $data = [
+            'status' => 500,
+            'message' => $RequestMethod . " Internal Server Error"
+        ];
+
+        header("HTTP/1.1 500 Internal Server Error");
+        header('Content-Type: application/json');
+        return json_encode($data);
+    }
+}
+
+
+
 ?>
